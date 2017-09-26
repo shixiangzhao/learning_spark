@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.Map.Entry;
 
 import org.apache.spark.SparkConf;
@@ -36,14 +37,16 @@ public class TestCombineByKey {
 	}
 
 	public static void main(String[] args) {
-		Function<Integer, AvgCount> createAcc = new Function<Integer, AvgCount>() {
+		Function<Integer, AvgCount> createAcc = 
+				new Function<Integer, AvgCount>() {
 
 			public AvgCount call(Integer v1) throws Exception {
 				return new AvgCount(v1, 1);
 			}
 		};
 
-		Function2<AvgCount, Integer, AvgCount> addAndCount = new Function2<AvgCount, Integer, AvgCount>() {
+		Function2<AvgCount, Integer, AvgCount> addAndCount = 
+				new Function2<AvgCount, Integer, AvgCount>() {
 
 			public AvgCount call(AvgCount v1, Integer v2) throws Exception {
 				v1.total_ += v2;
@@ -52,7 +55,8 @@ public class TestCombineByKey {
 			}
 		};
 
-		Function2<AvgCount, AvgCount, AvgCount> combine = new Function2<AvgCount, AvgCount, AvgCount>() {
+		Function2<AvgCount, AvgCount, AvgCount> combine = 
+				new Function2<AvgCount, AvgCount, AvgCount>() {
 
 			public AvgCount call(AvgCount v1, AvgCount v2) throws Exception {
 				v1.total_ += v2.total_;
@@ -62,12 +66,29 @@ public class TestCombineByKey {
 		};
 
 		AvgCount initial = new AvgCount(0, 0);
-		JavaPairRDD<String, Integer> counts = getWordCount();
-		JavaPairRDD<String, AvgCount> avgCounts = counts.combineByKey(createAcc, addAndCount, combine);
+		JavaPairRDD<String, Integer> counts = getJavaPairRDD();
+		JavaPairRDD<String, AvgCount> avgCounts = counts
+				.combineByKey(createAcc, addAndCount, combine);
 		Map<String, AvgCount> countMap = avgCounts.collectAsMap();
 		for (Entry<String, AvgCount> entry : countMap.entrySet()) {
-			System.out.println(entry.getKey() + ":" + entry.getValue().avg());
+			System.out.println(entry.getKey() + ":w" + entry.getValue().avg());
 		}
+	}
+
+	public static JavaPairRDD<String, Integer> getJavaPairRDD() {
+		SparkConf sparkConf = new SparkConf().setMaster("local").setAppName("Word Count")
+				.setSparkHome(ResourceManager.getSparkHome());
+		JavaSparkContext sc = new JavaSparkContext(sparkConf);
+		JavaRDD<String> input = sc.parallelize(Arrays.asList("panda", "monkey", "tiger", "panda"));
+		JavaPairRDD<String, Integer> counts = input.mapToPair(new PairFunction<String, String, Integer>() {
+			Random random = new Random(49);
+			public Tuple2<String, Integer> call(String t) throws Exception {
+				int v = random.nextInt(20);
+				System.out.println(t + ": " + v);
+				return new Tuple2<String, Integer>(t, v);
+			}
+		});
+		return counts;
 	}
 
 	public static JavaPairRDD<String, Integer> getWordCount() {
