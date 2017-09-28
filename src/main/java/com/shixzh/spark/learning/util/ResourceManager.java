@@ -12,6 +12,11 @@ public class ResourceManager {
         return USER_PATH + FILE_SEPARATOR + JCAT_LOG;
     }
 
+    public static String getResourceTextPath() {
+        return USER_PATH + FILE_SEPARATOR + "src" + FILE_SEPARATOR + "main" + FILE_SEPARATOR + "resource"
+                + FILE_SEPARATOR + "json" + FILE_SEPARATOR;
+    }
+
     public static String getResultPath() {
         return USER_PATH + FILE_SEPARATOR + RESULT_PATH;
     }
