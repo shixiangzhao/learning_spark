@@ -1,4 +1,4 @@
-package com.shixzh.spark.learning.rdd;
+package com.shixzh.spark.learning.rdd_3;
 
 import java.util.Arrays;
 

@@ -1,4 +1,4 @@
-package com.shixzh.spark.learning.file;
+package com.shixzh.spark.learning.file_5;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,7 +19,7 @@ public class ParseJson implements FlatMapFunction<Iterator<String>, Person> {
         SparkConf sparkConf = new SparkConf().setMaster("local").setAppName("Word Count")
                 .setSparkHome(ResourceManager.getSparkHome());
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
-        JavaRDD<String> input = sc.textFile(ResourceManager.getResourceTextPath() + "person.json");
+        JavaRDD<String> input = sc.textFile(ResourceManager.getResourceFilePath() + "person.json");
         JavaRDD<Person> result = input.mapPartitions(new ParseJson());
     }
 

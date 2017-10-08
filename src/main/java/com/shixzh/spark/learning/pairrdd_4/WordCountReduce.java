@@ -1,4 +1,4 @@
-package com.shixzh.spark.learning.pairrdd;
+package com.shixzh.spark.learning.pairrdd_4;
 
 import java.util.Arrays;
 import java.util.Iterator;
